@@ -1,0 +1,3 @@
+{
+  "view_extensions": ["haml", "erb", "jbuilder", "rabl"]
+}

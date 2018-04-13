@@ -9,7 +9,10 @@ clean_name = re.compile('^\s*(public\s+|private\s+|protected\s+|static\s+|functi
 class RailsNavigation(sublime_plugin.WindowCommand):
     def is_view(self, view):
         file_name = view.file_name()
-        return file_name.endswith('.haml') or file_name.endswith('.erb')
+
+        for extension in sublime.load_settings('RailsNavigation.sublime-settings').get('view_extensions'):
+            if file_name.endswith('.' + extension):
+                return True
 
     def is_controller(self, view):
         file_name = view.file_name()
@@ -67,8 +70,13 @@ class RailsNavigation(sublime_plugin.WindowCommand):
         if not method_name:
             return
 
-        view_glob = view.file_name().replace('/app/controllers/', '/app/views/').replace('_controller.rb', '/') + method_name + '*.haml'
-        self.path = glob.glob(view_glob)
+        self.path = []
+        for extension in sublime.load_settings('RailsNavigation.sublime-settings').get("view_extensions"):
+            view_glob = view.file_name().replace('/app/controllers/', '/app/views/').replace('_controller.rb', '/') + method_name + '.*.' + extension
+            self.path.extend(glob.glob(view_glob))
+
+        self.path = list(set(self.path))
+
         if len(self.path) == 1:
             self.window.open_file(self.path[0])
         if len(self.path) > 1:
@@ -80,6 +88,7 @@ class RailsNavigation(sublime_plugin.WindowCommand):
 
     def run(self):
         view = self.window.active_view()
+
         if self.is_view(view):
             self.show_action(view)
         if self.is_controller(view):
