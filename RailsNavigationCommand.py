@@ -72,7 +72,8 @@ class RailsNavigation(sublime_plugin.WindowCommand):
 
         self.path = []
         for extension in sublime.load_settings('RailsNavigation.sublime-settings').get("view_extensions"):
-            view_glob = view.file_name().replace('/app/controllers/', '/app/views/').replace('_controller.rb', '/') + method_name + '.' + extension
+            view_glob = view.file_name().replace('/app/controllers/', '/app/views/').replace('_controller.rb', '/') + method_name + '*' + '.' + extension
+            print(view_glob)
             self.path.extend(glob.glob(view_glob))
 
         self.path = list(set(self.path))
